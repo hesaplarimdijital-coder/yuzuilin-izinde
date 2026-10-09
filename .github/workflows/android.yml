@@ -1,0 +1,189 @@
+# Yüzyılın İzinde — Android paketi
+# Google Play'e yüklenecek imzalı .aab dosyasını ve telefonda denemek için .apk dosyasını üretir,
+# sonucu Actions "Artifacts" bölümüne ve bir GitHub Release'e koyar (APK'yı telefondan
+# doğrudan indirebilmek için).
+#
+# Çalıştırma: GitHub → Actions → "Android paketi" → Run workflow
+#             (main dalına her gönderimde de çalışır; v1.0.1 gibi bir sürüm etiketi
+#              gönderirseniz kalıcı bir sürüm yayınlar: git tag v1.0.1 && git push --tags)
+# Çıktı:      Releases sayfasındaki en üstteki kayıt → .apk / .aab dosyaları
+#             (ayrıca iş sayfasının altındaki "Artifacts" bölümü)
+#
+# İlk kurulum (bilgisayarsız): depo köküne projenin .zip dosyasını yükleyin; bu iş akışı
+# zip'i açar, dosyaları depoya işler ve ardından derler. Zip'in içindeki iş akışı
+# dosyaları .github/eklenecek-is-akislari/ altına konur (Actions bunları kendi
+# kendine depoya yazamaz); gerekirse oradan .github/workflows/ içine taşıyın.
+#
+# İmzalama için depo sırları (Settings → Secrets and variables → Actions → New repository secret):
+#   ANDROID_KEYSTORE_BASE64   yükleme anahtarı (.jks) dosyasının base64 hâli
+#   ANDROID_KEYSTORE_PASSWORD anahtar deposu parolası
+#   ANDROID_KEY_ALIAS         anahtar adı (ör. upload)
+#   ANDROID_KEY_PASSWORD      anahtar parolası
+# Sırlar yoksa yalnızca deneme (debug) APK'sı üretilir; Google Play'e yüklenemez.
+name: Android paketi
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - name: Depoyu indir
+        uses: actions/checkout@v7
+
+      - name: Zip yüklendiyse projeyi zip'ten kur
+        id: kur
+        run: |
+          ZIP=$(find . -maxdepth 1 -name '*.zip' | head -1)
+          if [ -z "$ZIP" ]; then
+            echo "Kök dizinde zip yok; mevcut dosyalarla devam ediliyor."
+          else
+            echo "Zip bulundu: $ZIP"
+            rm -rf /tmp/kaynak && mkdir -p /tmp/kaynak
+            unzip -oq "$ZIP" -d /tmp/kaynak
+            D=$(find /tmp/kaynak -maxdepth 2 -name package.json -printf '%h\n' | head -1)
+            [ -n "$D" ] || { echo "::error::Zip içinde package.json bulunamadı."; exit 1; }
+            rm -rf "$D/.git" "$D/node_modules" "$D/www" "$D/_site"
+            # Actions, iş akışı dosyalarını depoya yazamaz: kenara al
+            if [ -d "$D/.github/workflows" ]; then
+              mkdir -p "$D/.github/eklenecek-is-akislari"
+              for f in "$D"/.github/workflows/*; do
+                [ -f "$f" ] || continue
+                if [ -f ".github/workflows/$(basename "$f")" ]; then rm -f "$f"; else mv "$f" "$D/.github/eklenecek-is-akislari/"; fi
+              done
+              rm -rf "$D/.github/workflows"
+            fi
+            cp -a "$D"/. .
+            git rm -q --cached "$ZIP" 2>/dev/null || true
+            rm -f "$ZIP"
+            git add -A
+            if git diff --cached --quiet; then
+              echo "Depo zaten güncel."
+            elif [ "${GITHUB_REF_TYPE:-branch}" != "branch" ]; then
+              echo "Etiket derlemesi: dosyalar depoya yazılmadan derleniyor."
+            else
+              git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                commit -q -m "Projeyi zip'ten kur"
+              git push origin "HEAD:${GITHUB_REF_NAME:-main}"
+              echo "Proje depoya işlendi."
+            fi
+          fi
+          if [ ! -f package.json ]; then
+            echo "::warning::Depoda proje dosyaları yok (package.json bulunamadı). Projenin .zip dosyasını depo köküne yükleyin."
+            echo "atla=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Node.js kur
+        if: steps.kur.outputs.atla != '1'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Java 21 kur
+        if: steps.kur.outputs.atla != '1'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Android SDK kur
+        if: steps.kur.outputs.atla != '1'
+        uses: android-actions/setup-android@v3
+
+      - name: Oyunu denetle (sözdizimi ve olay listesi)
+        if: steps.kur.outputs.atla != '1'
+        run: node tools/denetle.js
+
+      - name: Bağımlılıkları kur
+        if: steps.kur.outputs.atla != '1'
+        run: npm ci
+
+      - name: Oyun dosyalarını uygulamaya kopyala
+        if: steps.kur.outputs.atla != '1'
+        run: |
+          node tools/build-www.mjs --app
+          npx cap sync android
+
+      - name: Sürüm numarasını belirle
+        if: steps.kur.outputs.atla != '1'
+        run: |
+          NAME=$(node -p "require('./package.json').version")
+          case "$GITHUB_REF" in refs/tags/v*) NAME="${GITHUB_REF#refs/tags/v}";; esac
+          # Play her yüklemede daha büyük bir versionCode ister: iş numarası kullanılır
+          echo "VERSION_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$((100 + GITHUB_RUN_NUMBER))" >> "$GITHUB_ENV"
+
+      - name: Yükleme anahtarını hazırla
+        if: steps.kur.outputs.atla != '1' && env.HAS_KEYSTORE == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+
+      - name: Derle
+        if: steps.kur.outputs.atla != '1'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          if [ "$HAS_KEYSTORE" = "true" ]; then
+            ./gradlew --no-daemon --stacktrace bundleRelease assembleRelease
+          else
+            echo "::warning::İmza anahtarı tanımlı değil: yalnızca deneme (debug) APK üretiliyor. Google Play'e yüklemek için depo sırlarını ekleyin."
+            ./gradlew --no-daemon --stacktrace assembleDebug
+          fi
+
+      - name: Paketleri topla
+        if: steps.kur.outputs.atla != '1'
+        run: |
+          mkdir -p cikti
+          find android/app/build/outputs \( -name "*.aab" -o -name "*.apk" \) -exec cp {} cikti/ \;
+          cd cikti
+          for f in *; do mv "$f" "yuzyilin-izinde-${VERSION_NAME}-${VERSION_CODE}-${f#app-}"; done
+          ls -la
+
+      - name: Paketleri yükle (Artifacts)
+        if: steps.kur.outputs.atla != '1'
+        uses: actions/upload-artifact@v7
+        with:
+          name: yuzyilin-izinde-android-${{ env.VERSION_NAME }}-${{ env.VERSION_CODE }}
+          path: cikti/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: GitHub Release olarak yayınla
+        if: steps.kur.outputs.atla != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          case "$GITHUB_REF" in
+            refs/tags/v*) TAG="$GITHUB_REF_NAME"; TITLE="Yüzyılın İzinde $VERSION_NAME"; EXTRA="";;
+            *)            TAG="derleme-$VERSION_CODE"; TITLE="Deneme derlemesi $VERSION_NAME ($VERSION_CODE)"; EXTRA="--prerelease";;
+          esac
+          if [ "$HAS_KEYSTORE" = "true" ]; then
+            NOT="İmzalı sürüm: .aab dosyası Google Play'e yüklenir, .apk dosyası telefonda denemek içindir."
+          else
+            NOT="Deneme (debug) APK'sı: telefona kurup oynamak için. Google Play'e yüklenemez; imzalı sürüm için depo sırlarını ekleyin."
+          fi
+          gh release create "$TAG" cikti/* --title "$TITLE" --notes "$NOT" --target "$(git rev-parse HEAD)" $EXTRA \
+            || gh release upload "$TAG" cikti/* --clobber
