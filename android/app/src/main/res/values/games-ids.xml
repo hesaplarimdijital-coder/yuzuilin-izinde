@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Google Play Games Services kimlikleri
+  ─────────────────────────────────────
+  Play Console → (uygulamanız) → Play Games Services → Kurulum ve yönetim → Yapılandırma:
+    • "Proje kimliği" (yalnızca rakamlar, ör. 123456789012)  → game_services_project_id
+  Play Console → Play Games Services → Kurulum ve yönetim → Liderlik tabloları:
+    • "En uzun yolculuk" tablosunun kimliği (CgkI ile başlar) → leaderboard_distance
+
+  Play Console'daki "Kaynakları al" düğmesi bu değerleri içeren bir XML verir; oradan
+  yalnızca kimlikleri kopyalayıp aşağıya yapıştırın (kaynak adlarını değiştirmeyin).
+  Kimlikler girilmemişse uygulama sorunsuz çalışır, yalnızca liderlik düğmesi görünmez.
+-->
+<resources>
+    <string name="game_services_project_id" translatable="false">BURAYA_PROJE_KIMLIGI</string>
+    <string name="leaderboard_distance" translatable="false">BURAYA_LIDERLIK_TABLOSU_KIMLIGI</string>
+</resources>

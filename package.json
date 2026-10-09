@@ -1,0 +1,26 @@
+{
+  "name": "yuzyilin-izinde",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Yüzyılın İzinde — Cumhuriyet'in yüz yılı arka planda akarken oynanan 2.5B sonsuz koşu oyunu (web + Android).",
+  "license": "UNLICENSED",
+  "scripts": {
+    "denetle": "node tools/denetle.js",
+    "www": "node tools/build-www.mjs --app",
+    "android:sync": "node tools/build-www.mjs --app && npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:debug": "node tools/build-www.mjs --app && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "node tools/build-www.mjs --app && npx cap sync android && cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

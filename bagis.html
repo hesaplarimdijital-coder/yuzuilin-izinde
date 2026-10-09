@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Destek ol · Yüzyılın İzinde</title>
+<meta name="description" content="Yüzyılın İzinde ücretsiz ve reklamsız bir oyun. Beğendiysen küçük bir bağışla destek olabilirsin.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>
+/* =====================================================================================
+   BAĞIŞ AYARLARI — yalnızca burayı düzenleyin
+   ─────────────────────────────────────────
+   links: her tutar için ödeme bağlantısı. Shopier, iyzico "iyzilink", Papara "Bana Gönder",
+          Kreosus, Patreon, Ko-fi vb. hizmetlerde tutara göre birer bağlantı oluşturup buraya
+          yapıştırın. Boş bırakılan tutarın düğmesi "yakında" olarak görünür.
+   general: tutarın karşı tarafta seçildiği tek bir genel bağış sayfası (isteğe bağlı). Doluysa
+          bağlantısı boş olan tutarlar bu sayfaya yönlenir.
+   iban / ibanName / papara: havale-EFT ve Papara bilgisi (isteğe bağlı; boşsa bölüm görünmez).
+   ===================================================================================== */
+window.BAGIS = {
+  links: { 20: '', 50: '', 100: '', 250: '', 500: '', 1000: '' },
+  general: '',
+  iban: '', ibanName: '', papara: '',
+};
+</script>
+<style>
+  @font-face { font-family: "Libre Baskerville"; font-style: normal; font-weight: 700; font-display: swap; src: url(assets/fonts/libre-baskerville-700-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "Libre Baskerville"; font-style: normal; font-weight: 700; font-display: swap; src: url(assets/fonts/libre-baskerville-700-ext.woff2) format("woff2"); unicode-range: U+0100-0130, U+0132-0151, U+0154-017F; }
+  @font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/fira-sans-400-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/fira-sans-400-ext.woff2) format("woff2"); unicode-range: U+0100-0130, U+0132-0151, U+0154-017F, U+20BA; }
+  @font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url(assets/fonts/fira-sans-500-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+2215; }
+  @font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url(assets/fonts/fira-sans-500-ext.woff2) format("woff2"); unicode-range: U+0100-0130, U+0132-0151, U+0154-017F, U+20BA; }
+  :root { --bg: #0d0c0b; --paper: #f1e6cf; --paper-2: #d9ccb2; --paper-3: #a99c84; --line: rgba(241, 230, 207, 0.16); --red: #d2232a; --red-hi: #e6333a; --glass: rgba(20, 18, 16, 0.72); }
+  html { background: var(--bg); }
+  body { margin: 0; color: var(--paper-2); font: 400 16px/1.6 "Fira Sans", system-ui, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 760px; margin: 0 auto; padding: 44px 20px 64px; }
+  h1 { font-family: "Libre Baskerville", Georgia, serif; font-weight: 700; color: var(--paper); font-size: clamp(28px, 6vw, 42px); line-height: 1.15; margin: 0 0 6px; }
+  .eyebrow { font-family: "Fira Sans", sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--paper-3); margin-bottom: 12px; }
+  .rule { height: 2px; width: 120px; background: linear-gradient(90deg, var(--red), rgba(210, 35, 42, 0.2)); margin: 18px 0 22px; }
+  p { margin: 0 0 14px; max-width: 60ch; text-wrap: pretty; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 26px 0 10px; }
+  .tile { display: flex; flex-direction: column; gap: 4px; padding: 16px 16px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(241, 230, 207, 0.035); color: var(--paper); text-decoration: none; transition: border-color 0.2s, background 0.2s, transform 0.15s; }
+  .tile:hover { border-color: var(--paper-3); background: rgba(241, 230, 207, 0.07); }
+  .tile:active { transform: translateY(1px); }
+  .tile b { font-family: "Libre Baskerville", Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.1; font-variant-numeric: lining-nums; }
+  .tile small { font-size: 13px; color: var(--paper-3); }
+  .tile.soon { opacity: 0.45; cursor: not-allowed; }
+  .tile.soon:hover { border-color: var(--line); background: rgba(241, 230, 207, 0.035); }
+  .tile.pick { border-color: var(--red); background: rgba(210, 35, 42, 0.1); }
+  .tile.pick b { color: #fff; }
+  .note { font-size: 13.5px; color: var(--paper-3); }
+  h2 { font-family: "Libre Baskerville", Georgia, serif; font-weight: 700; color: var(--paper); font-size: 20px; margin: 36px 0 10px; }
+  .bank { display: grid; gap: 10px; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--glass); }
+  .row .k { font-family: "Fira Sans", sans-serif; font-weight: 500; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--paper-3); min-width: 64px; }
+  .row code { font-family: ui-monospace, "Fira Sans", monospace; font-size: 15px; color: var(--paper); letter-spacing: 0.04em; word-break: break-all; flex: 1 1 auto; }
+  .copy { font: 500 12px "Fira Sans", sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper); background: transparent; border: 1px solid var(--line); border-radius: 4px; padding: 7px 12px; cursor: pointer; }
+  .copy:hover { border-color: var(--paper-3); }
+  .back { display: inline-block; margin-top: 36px; font: 500 13px "Fira Sans", sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: var(--paper-3); text-decoration: none; }
+  .back:hover { color: var(--paper); }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 9px 16px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); color: var(--paper); font-size: 13px; opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+  #toast.in { opacity: 1; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Yüzyılın İzinde</div>
+  <h1>Oyunu beğendiysen bir çay ısmarla</h1>
+  <div class="rule"></div>
+  <p>Yüzyılın İzinde ücretsiz, reklamsız ve veri toplamayan bir oyun; öyle de kalacak. Bir şey satın almıyorsun, oyunda hiçbir şey açılmıyor. Bağışlar yalnızca yeni olayların, sahnelerin ve dönemlerin yapımına harcanıyor.</p>
+  <p class="note">Tutar seçince ödeme sayfasına yönlendirilirsin. Bağış zorunlu değil; oynadığın için zaten teşekkürler.</p>
+
+  <div class="tiles" id="tiles">
+    <a class="tile" data-amount="20"><b>20 ₺</b><small>Bir bardak çay</small></a>
+    <a class="tile" data-amount="50"><b>50 ₺</b><small>Çay ve simit</small></a>
+    <a class="tile" data-amount="100"><b>100 ₺</b><small>Bir kahve</small></a>
+    <a class="tile" data-amount="250"><b>250 ₺</b><small>Bir sinema bileti</small></a>
+    <a class="tile" data-amount="500"><b>500 ₺</b><small>Bir kitap</small></a>
+    <a class="tile" data-amount="1000"><b>1.000 ₺</b><small>Yüzyılın destekçisi</small></a>
+  </div>
+  <p class="note" id="soonNote" hidden>Bağış bağlantıları henüz tanımlanmadı; yakında.</p>
+
+  <section id="bank" hidden>
+    <h2>Havale / EFT ya da Papara</h2>
+    <div class="bank">
+      <div class="row" id="rowIban" hidden><span class="k">IBAN</span><code id="iban"></code><button class="copy" type="button" data-copy="iban">Kopyala</button></div>
+      <div class="row" id="rowName" hidden><span class="k">Ad</span><code id="ibanName"></code></div>
+      <div class="row" id="rowPapara" hidden><span class="k">Papara</span><code id="papara"></code><button class="copy" type="button" data-copy="papara">Kopyala</button></div>
+    </div>
+  </section>
+
+  <a class="back" href="./">← Oyuna dön</a>
+</main>
+<div id="toast" role="status"></div>
+<script>
+(function () {
+  const C = window.BAGIS || {};
+  const links = C.links || {};
+  let any = false;
+  document.querySelectorAll('.tile').forEach((t) => {
+    const a = t.dataset.amount;
+    const url = (links[a] || '').trim() || (C.general || '').trim();
+    if (url) { t.href = url; t.target = '_blank'; t.rel = 'noopener'; any = true; }
+    else { t.classList.add('soon'); t.setAttribute('aria-disabled', 'true'); t.addEventListener('click', (e) => { e.preventDefault(); toast('Bu tutar için bağlantı henüz yok'); }); }
+    t.addEventListener('mouseenter', () => t.classList.add('pick'));
+    t.addEventListener('mouseleave', () => t.classList.remove('pick'));
+  });
+  document.getElementById('soonNote').hidden = any;
+  const bank = !!((C.iban || '').trim() || (C.papara || '').trim());
+  document.getElementById('bank').hidden = !bank;
+  if (bank) {
+    if ((C.iban || '').trim()) { document.getElementById('rowIban').hidden = false; document.getElementById('iban').textContent = C.iban.trim(); }
+    if ((C.ibanName || '').trim()) { document.getElementById('rowName').hidden = false; document.getElementById('ibanName').textContent = C.ibanName.trim(); }
+    if ((C.papara || '').trim()) { document.getElementById('rowPapara').hidden = false; document.getElementById('papara').textContent = C.papara.trim(); }
+  }
+  let tm = null;
+  function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('in'); clearTimeout(tm); tm = setTimeout(() => el.classList.remove('in'), 1800); }
+  document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', () => {
+    const text = document.getElementById(b.dataset.copy).textContent;
+    const done = () => toast('Kopyalandı');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => fallback(text, done));
+    else fallback(text, done);
+  }));
+  function fallback(text, done) { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Kopyalanamadı'); } document.body.removeChild(ta); }
+})();
+</script>
+</body>
+</html>

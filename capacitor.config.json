@@ -1,0 +1,19 @@
+{
+  "appId": "com.yuzyilinizinde.oyun",
+  "appName": "Yüzyılın İzinde",
+  "webDir": "www",
+  "backgroundColor": "#0d0c0b",
+  "android": {
+    "backgroundColor": "#0d0c0b",
+    "allowMixedContent": false,
+    "captureInput": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "hidden": true,
+      "style": "DARK",
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

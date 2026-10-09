@@ -1,0 +1,17 @@
+{
+  "name": "Yüzyılın İzinde",
+  "short_name": "İzinde",
+  "description": "Türkiye’nin 1923’ten 2026’ya önemli olayları arka planda akarken oynanan 2.5B sonsuz koşu oyunu.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0d0c0b",
+  "theme_color": "#0d0c0b",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

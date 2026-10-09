@@ -1,0 +1,23 @@
+# Node / Capacitor
+node_modules/
+www/
+_site/
+
+# Android derleme çıktıları (android/.gitignore ayrıca diğerlerini dışlar)
+android/app/release/
+*.aab
+*.apk
+
+# İmzalama anahtarları ASLA depoya girmez
+*.jks
+*.keystore
+android/keystore.properties
+
+# Sistem
+.DS_Store
+Thumbs.db
+
+# Yerel test sayfaları
+_gallery.html
+_qa.html
+_bgqa.html

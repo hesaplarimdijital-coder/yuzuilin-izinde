@@ -1,0 +1,48 @@
+# Yüzyılın İzinde — GitHub Pages yayını
+# main (ya da master) dalına her gönderimde oyunu denetler ve GitHub Pages'te yayınlar.
+# İlk kurulum: Settings → Pages → Build and deployment → Source: "GitHub Actions"
+name: Oyunu yayınla
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Aynı anda tek yayın; sırada bekleyen eski yayınlar atlanır, süren yayın yarıda kesilmez.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu indir
+        uses: actions/checkout@v7
+
+      - name: Oyunu denetle (sözdizimi ve olay listesi)
+        run: node tools/denetle.js
+
+      - name: Pages ayarlarını hazırla
+        uses: actions/configure-pages@v6
+
+      # Yalnızca oyunun kendi dosyaları yayınlanır (android/, store/, README görselleri değil)
+      - name: Site dosyalarını hazırla
+        run: node tools/build-www.mjs _site
+
+      - name: Site dosyalarını paketle
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: '_site'
+
+      - name: GitHub Pages'te yayınla
+        id: deployment
+        uses: actions/deploy-pages@v5
